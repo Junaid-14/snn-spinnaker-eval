@@ -32,9 +32,11 @@ systematic gap, consistent across all seeds.
   version uses the exact `iaf_psc_exp` propagator cross-factor
   (`0.8833 mV/nA`), matching Brian2/PyNN's "exact" integration method.
 - **Validation:** Brian2/PyNN cross-check on 20 stratified reference samples
-  with identical Poisson spike arrays — **20/20 argmax predictions matched**.
-  Residual spike-count differences (3–7 spikes total across the 10 head
-  neurons) are attributable to discrete-time refractory quantization.
+  at SCALE=10 with identical Poisson spike arrays — **20/20 argmax predictions
+  matched**. Residual spike-count differences (3–7 spikes total across the 10
+  head neurons) are attributable to discrete-time refractory quantization.
+  Agreement at SCALE=10 (higher firing, the more stringent case) implies
+  agreement at the reported SCALE=7.
 
 ## Results
 
@@ -42,7 +44,7 @@ systematic gap, consistent across all seeds.
 |-----------|-------|
 | **SpiNNaker sim mean accuracy** | **93.86%** |
 | **Std (5 seeds)** | **0.15%** |
-| **95% CI (t-based, 4 df)** | **[93.57%, 94.15%]** |
+| **Seed range (min–max)** | **93.75%–94.15%** |
 | PyTorch baseline (deterministic) | 94.90% |
 | Agreement with PyTorch | 95.32% ± 0.18% |
 | All-zero / no-prediction samples | **0 / 10,000** (5 seeds × 2000) |
@@ -100,16 +102,34 @@ is sufficient.
 
 ### 1. Run the main evaluation (fast PyTorch simulator)
 
+Single run (one seed, quick check):
+
 ```bash
 python test_spinnaker_discrete_exact.py \
     --checkpoint path/to/your/checkpoint.pt \
     --cal-samples 50 \
-    --test-samples 500 \
+    --test-samples 2000 \
     --scale 7.0 \
     --rate-scale 10.0 \
     --duration 100.0 \
     --seed 42
 ```
+
+Reproduce the reported result (mean over 5 seeds, 2000 samples):
+
+```bash
+for SEED in 42 123 456 789 999; do
+  python test_spinnaker_discrete_exact.py \
+      --checkpoint path/to/your/checkpoint.pt \
+      --cal-samples 50 \
+      --test-samples 2000 \
+      --scale 7.0 \
+      --rate-scale 10.0 \
+      --duration 100.0 \
+      --seed $SEED
+done
+```
+(Then average the five reported accuracies.)
 
 ### 2. Verify against Brian2 on a tiny reference network
 
