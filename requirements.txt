@@ -1,0 +1,6 @@
+torch==2.11.0
+snntorch==0.9.4
+numpy==1.26.4
+brian2==2.9.0
+pyNN==0.14.1
+sPyNNaker==7.4.1

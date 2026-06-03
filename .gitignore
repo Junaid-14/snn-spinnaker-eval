@@ -1,0 +1,12 @@
+*.pt
+*.pth
+*.pkl
+data/
+datasets/
+__pycache__/
+*.pyc
+.DS_Store
+results/
+checkpoints/
+*.egg-info/
+.env
